@@ -2,16 +2,53 @@
 USE MASTER 
 GO
 
+/*
+	CRIAÇÃO DE BANCO DE DADOS COM DUAS DIVISÕES, DADOS PRIMÁRIOS (MDF) E SECUNDÁRIO (NDF).
+*/
+
+
+--DECLARE 
+--	@CAMINHO_PRINCIPAL VARCHAR(300) = 'C:\Databases\Principal\metadados.mdf',
+--	@CAMINHO_SECUDARIO VARCHAR(300) = 'E:\Database\Filegroup\dados.ndf',
+--	@CAMINHO_LOG       VARCHAR(300) = 'E:\Database\Log'
+
+
 IF NOT EXISTS (SELECT 1 FROM SYS.databases WHERE NAME = 'DB_IMOVEIS')
 BEGIN 
+
 	CREATE DATABASE DB_IMOVEIS
+	ON
+	PRIMARY
+	(
+		NAME = METADADOS_DB_IMOVEIS,
+		FILENAME = 'C:\Databases\Principal\metadados.mdf',
+		SIZE = 30MB,
+		MAXSIZE = 100MB,
+		FILEGROWTH = 30MB
+	),
+	(
+		NAME = DADOS_DB_IMOVEIS, 
+		FILENAME = 'E:\Database\Filegroup\dados.ndf',
+		SIZE = 50MB,
+		MAXSIZE = 300MB,
+		FILEGROWTH = 100MB
+	)
+	LOG ON 
+	(
+		NAME = DB_IMOVEIS_LOG,
+		FILENAME = 'E:\Database\Log\db_imoveis_log.ldf',
+		SIZE = 5MB,
+		MAXSIZE = 25MB,
+		FILEGROWTH = 5MB
+	)
+
 END
 GO
 
 USE DB_IMOVEIS
 GO
 
-IF NOT EXISTS (SELECT * FROM SYS.all_objects WHERE NAME = 'ESTADO')
+IF NOT EXISTS (SELECT 1 FROM SYS.all_objects WHERE NAME = 'ESTADO')
 BEGIN 
 	CREATE TABLE ESTADO 
 	(
@@ -21,6 +58,8 @@ BEGIN
 		PRIMARY KEY (SG_ESTADO)
 	)
 END
+
+
 
 
 IF NOT EXISTS (SELECT * FROM SYS.all_objects WHERE NAME = 'FAIXA_IMOVEL')
